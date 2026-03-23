@@ -1,0 +1,37 @@
+{
+  "name": "openclaw-bridge",
+  "version": "0.1.0",
+  "description": "Bridge between Claude Code and OpenClaw AI agents — MCP tools, SDK bridge, modular architecture",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "openclaw-bridge": "bin/openclaw-bridge.mjs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/claude-code": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT",
+  "keywords": [
+    "openclaw",
+    "claude-code",
+    "mcp",
+    "ai-agents",
+    "bridge"
+  ]
+}
