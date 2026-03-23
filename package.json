@@ -1,6 +1,6 @@
 {
   "name": "openclaw-bridge",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "description": "Bridge between Claude Code and OpenClaw AI agents — MCP tools, SDK bridge, modular architecture",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,6 +25,20 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md",
+    "SKILL.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Codename-11/openclaw-bridge.git"
   },
   "license": "MIT",
   "keywords": [

@@ -1,0 +1,7 @@
+src/
+tsconfig.json
+.gitignore
+CLAUDE.md
+node_modules/
+*.ts
+!dist/**/*.ts
