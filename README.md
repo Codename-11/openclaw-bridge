@@ -1,5 +1,11 @@
 # openclaw-bridge
 
+## Quick Install
+
+```bash
+npx openclaw-bridge@github:Codename-11/openclaw-bridge setup
+```
+
 **openclaw-bridge** is a modular CLI package that bridges Claude Code and OpenClaw AI agents. It absorbs the functionality of `openclaw-mcp` and extends it with a full module architecture — MCP tools for querying agents from Claude Code, an HTTP bridge for pushing messages into Claude Code sessions from agent code, and a placeholder relay module for future Voxel device support.
 
 ## Quick Setup
