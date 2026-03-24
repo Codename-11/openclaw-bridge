@@ -52,28 +52,23 @@ class GatewayClient {
         }
     }
     async listAgents() {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30_000);
+        // The gateway doesn't have a /v1/models endpoint — ask Daemon to list agents
         try {
-            const response = await fetch(`${this.url}/v1/models`, {
-                headers: this.headers(),
-                signal: controller.signal,
-            });
-            clearTimeout(timeout);
-            if (!response.ok) {
-                const errText = await response.text().catch(() => response.statusText);
-                throw new Error(`Gateway error (${response.status}): ${errText}`);
+            const response = await this.askAgent('daemon', 'List all available agents on this OpenClaw instance. Return ONLY a JSON array of objects like: [{"id":"daemon","name":"Daemon","role":"Lead agent"}]. No other text.', 'agent:daemon:bridge-list');
+            // Try to parse JSON from the response
+            const match = response.match(/\[[\s\S]*\]/);
+            if (match) {
+                const agents = JSON.parse(match[0]);
+                return agents.map((a) => ({
+                    id: a.id,
+                    name: a.name,
+                    ownedBy: a.role,
+                }));
             }
-            const data = (await response.json());
-            return (data?.data ?? []).map((m) => ({
-                id: m.id,
-                name: m.id.replace(/^openclaw:/, ''),
-                ownedBy: m.owned_by,
-                created: m.created,
-            }));
+            // Fallback: return daemon as the known agent
+            return [{ id: 'daemon', name: 'Daemon', ownedBy: 'lead' }];
         }
         catch (err) {
-            clearTimeout(timeout);
             const msg = err instanceof Error ? err.message : String(err);
             logger.error(`listAgents failed: ${msg}`);
             throw new Error(`Failed to list agents: ${msg}`);
@@ -182,18 +177,12 @@ class GatewayClient {
         }
     }
     async healthCheck() {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10_000);
+        // Test with a lightweight chat completion instead of /v1/models (which returns HTML)
         try {
-            const response = await fetch(`${this.url}/v1/models`, {
-                headers: this.headers(),
-                signal: controller.signal,
-            });
-            clearTimeout(timeout);
-            return response.ok;
+            const response = await this.askAgent('daemon', 'ping', 'agent:daemon:bridge-health');
+            return response.length > 0;
         }
         catch {
-            clearTimeout(timeout);
             return false;
         }
     }
