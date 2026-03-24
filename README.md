@@ -1,20 +1,32 @@
 # openclaw-bridge
 
-## Quick Install
+## Install
 
 ```bash
-npx openclaw-bridge@github:Codename-11/openclaw-bridge setup
+# Install from GitHub
+npm install -g github:Codename-11/openclaw-bridge
+
+# Run setup wizard
+openclaw-bridge setup
+
+# Update to latest
+npm install -g github:Codename-11/openclaw-bridge
+```
+
+When published to npm (coming soon):
+```bash
+npm install -g openclaw-bridge
 ```
 
 **openclaw-bridge** is a modular CLI package that bridges Claude Code and OpenClaw AI agents. It absorbs the functionality of `openclaw-mcp` and extends it with a full module architecture — MCP tools for querying agents from Claude Code, Discord integration, notifications, project memory, steering, and an HTTP bridge for pushing messages into Claude Code sessions from agent code.
 
-## Quick Setup
+## Dev Setup (contributors)
 
 ```bash
 git clone https://github.com/Codename-11/openclaw-bridge
 cd openclaw-bridge
-npm install && npm run build
-npx openclaw-bridge setup
+npm install
+npm run build
 ```
 
 ## Modules
@@ -412,15 +424,18 @@ Messages are cleared after reading. Each `check_steering` call is a one-time del
 ## Uninstall
 
 ```bash
-# Remove from Claude Code
+# Remove MCP from Claude Code
 claude mcp remove openclaw
 
-# Remove global install (if installed globally)
+# Remove package
 npm uninstall -g openclaw-bridge
 
-# Remove config
+# Remove config + data
 rm -rf ~/.openclaw-bridge          # macOS/Linux
 rmdir /s /q %USERPROFILE%\.openclaw-bridge   # Windows
+
+# Remove project memory (optional, per-project)
+rm .openclaw-bridge/memory.json
 ```
 
 ## License
