@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { spawn } from 'child_process'
 import { homedir } from 'os'
 import { join, resolve } from 'path'
 import type { GatewayClient } from '../../core/gateway.js'
@@ -277,6 +278,83 @@ export function buildToolHandlers(gateway: GatewayClient) {
         return { content: [{ type: 'text', text: msg }], isError: true }
       }
     },
+
+    async start_bridge(args: Record<string, unknown>) {
+      const port = (args?.port as number) || 9999
+      const project = args?.project as string || ''
+
+      // Check if bridge is already running
+      try {
+        const resp = await fetch(`http://localhost:${port}/health`)
+        if (resp.ok) {
+          return { content: [{ type: 'text', text: `Bridge already running on port ${port}.` }] }
+        }
+      } catch {
+        // Not running, good
+      }
+
+      // Find the bridge start script
+      const appDir = join(homedir(), '.openclaw-bridge', 'app')
+      const startScript = join(appDir, 'dist', 'cli', 'start.js')
+
+      if (!existsSync(startScript)) {
+        return {
+          content: [{ type: 'text', text: 'Bridge not installed. Run the installer first: irm https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.ps1 | iex' }],
+          isError: true,
+        }
+      }
+
+      try {
+        // Spawn detached bridge process
+        const child = spawn('node', ['-e', `require('${startScript.replace(/\\/g, '/')}').runStart(['bridge'])`], {
+          detached: true,
+          stdio: 'ignore',
+          env: { ...process.env },
+        })
+        child.unref()
+
+        // Wait a moment and verify it started
+        await new Promise((r) => setTimeout(r, 2000))
+
+        try {
+          const resp = await fetch(`http://localhost:${port}/health`)
+          if (resp.ok) {
+            let msg = `Bridge started on port ${port} (background process).`
+            if (project) {
+              // Auto-create session
+              await fetch(`http://localhost:${port}/session`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ project }),
+              })
+              msg += ` Session created for: ${project}`
+            }
+            return { content: [{ type: 'text', text: msg }] }
+          }
+        } catch {}
+
+        return { content: [{ type: 'text', text: `Bridge process spawned on port ${port}. It may take a moment to start.` }] }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err)
+        return { content: [{ type: 'text', text: `Failed to start bridge: ${msg}` }], isError: true }
+      }
+    },
+
+    async stop_bridge(args: Record<string, unknown>) {
+      const port = (args?.port as number) || 9999
+
+      try {
+        const resp = await fetch(`http://localhost:${port}/health`)
+        if (!resp.ok) {
+          return { content: [{ type: 'text', text: 'Bridge is not running.' }] }
+        }
+      } catch {
+        return { content: [{ type: 'text', text: 'Bridge is not running.' }] }
+      }
+
+      // There's no graceful shutdown endpoint yet — just report status
+      return { content: [{ type: 'text', text: `Bridge is running on port ${port}. To stop it, close the terminal or kill the process.` }] }
+    },
   }
 }
 
@@ -440,6 +518,39 @@ export const TOOL_DEFINITIONS = [
         },
       },
       required: ['status'],
+    },
+  },
+  {
+    name: 'start_bridge',
+    description:
+      'Start the openclaw-bridge HTTP listener as a background process. This allows OpenClaw agents (like Daemon) to push messages to Claude Code. The bridge survives after Claude Code exits.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        port: {
+          type: 'number',
+          description: 'Port to run the bridge on (default: 9999)',
+        },
+        project: {
+          type: 'string',
+          description: 'Project directory to auto-create a session for',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'stop_bridge',
+    description: 'Check if the bridge is running and get info on how to stop it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        port: {
+          type: 'number',
+          description: 'Port to check (default: 9999)',
+        },
+      },
+      required: [],
     },
   },
 ]

@@ -130,6 +130,25 @@ export declare function buildToolHandlers(gateway: GatewayClient): {
         }[];
         isError?: undefined;
     }>;
+    start_bridge(args: Record<string, unknown>): Promise<{
+        content: {
+            type: string;
+            text: string;
+        }[];
+        isError?: undefined;
+    } | {
+        content: {
+            type: string;
+            text: string;
+        }[];
+        isError: boolean;
+    }>;
+    stop_bridge(args: Record<string, unknown>): Promise<{
+        content: {
+            type: string;
+            text: string;
+        }[];
+    }>;
 };
 export declare const TOOL_DEFINITIONS: ({
     name: string;
@@ -151,6 +170,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
     };
@@ -168,6 +189,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: never[];
     };
@@ -188,6 +211,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
     };
@@ -211,6 +236,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: never[];
     };
@@ -234,6 +261,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
     };
@@ -257,6 +286,8 @@ export declare const TOOL_DEFINITIONS: ({
             key?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
     };
@@ -277,6 +308,8 @@ export declare const TOOL_DEFINITIONS: ({
             urgent?: undefined;
             value?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: never[];
     };
@@ -300,6 +333,8 @@ export declare const TOOL_DEFINITIONS: ({
             limit?: undefined;
             urgent?: undefined;
             status?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
     };
@@ -323,8 +358,57 @@ export declare const TOOL_DEFINITIONS: ({
             urgent?: undefined;
             key?: undefined;
             value?: undefined;
+            port?: undefined;
+            project?: undefined;
         };
         required: string[];
+    };
+} | {
+    name: string;
+    description: string;
+    inputSchema: {
+        type: string;
+        properties: {
+            port: {
+                type: string;
+                description: string;
+            };
+            project: {
+                type: string;
+                description: string;
+            };
+            agent?: undefined;
+            message?: undefined;
+            channel?: undefined;
+            limit?: undefined;
+            urgent?: undefined;
+            key?: undefined;
+            value?: undefined;
+            status?: undefined;
+        };
+        required: never[];
+    };
+} | {
+    name: string;
+    description: string;
+    inputSchema: {
+        type: string;
+        properties: {
+            port: {
+                type: string;
+                description: string;
+            };
+            agent?: undefined;
+            message?: undefined;
+            channel?: undefined;
+            limit?: undefined;
+            urgent?: undefined;
+            key?: undefined;
+            value?: undefined;
+            status?: undefined;
+            project?: undefined;
+        };
+        required: never[];
     };
 })[];
 //# sourceMappingURL=tools.d.ts.map
