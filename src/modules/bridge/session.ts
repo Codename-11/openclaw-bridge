@@ -10,9 +10,10 @@ let sdkAvailable = false
 async function loadSDK(): Promise<boolean> {
   if (sdkAvailable) return true
   try {
-    // The SDK is ESM-only. Use dynamic import() which works in both CJS and ESM.
+    // The SDK is ESM-only and has no 'main'/'exports' field.
+    // Import directly from the cli.js entry which contains the SDK exports.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mod = await (Function('return import("@anthropic-ai/claude-code")')()) as any
+    const mod = await (Function('return import("@anthropic-ai/claude-code/cli.js")')()) as any
     // Try named export first, then default
     ClaudeCodeSDK = mod.ClaudeCodeSDK ?? mod.default?.ClaudeCodeSDK ?? mod.default
     if (!ClaudeCodeSDK) {
