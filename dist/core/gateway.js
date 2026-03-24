@@ -54,7 +54,7 @@ class GatewayClient {
     async listAgents() {
         // The gateway doesn't have a /v1/models endpoint — ask Daemon to list agents
         try {
-            const response = await this.askAgent('daemon', 'List all available agents on this OpenClaw instance. Return ONLY a JSON array of objects like: [{"id":"daemon","name":"Daemon","role":"Lead agent"}]. No other text.', 'agent:daemon:bridge-list');
+            const response = await this.askAgent('daemon', 'List all available agents on this OpenClaw instance. Return ONLY a JSON array of objects like: [{"id":"daemon","name":"Daemon","role":"Lead agent"}]. No other text.');
             // Try to parse JSON from the response
             const match = response.match(/\[[\s\S]*\]/);
             if (match) {
@@ -179,7 +179,7 @@ class GatewayClient {
     async healthCheck() {
         // Test with a lightweight chat completion instead of /v1/models (which returns HTML)
         try {
-            const response = await this.askAgent('daemon', 'ping', 'agent:daemon:bridge-health');
+            const response = await this.askAgent('daemon', 'ping');
             return response.length > 0;
         }
         catch {
