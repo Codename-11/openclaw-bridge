@@ -87,8 +87,9 @@ export class BridgeListener {
               return
             }
 
-            logger.info(`Incoming message from ${data.from ?? 'unknown'}`)
+            logger.info(`Incoming message from ${data.from ?? 'unknown'}: ${data.message.slice(0, 100)}${data.message.length > 100 ? '...' : ''}`)
             const response = await this.session.sendMessage(data.message)
+            logger.info(`Response: ${response.slice(0, 200)}${response.length > 200 ? '...' : ''}`)
             json(res, 200, { response })
             return
           }
