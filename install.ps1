@@ -45,7 +45,7 @@ node -e "require('$($InstallDir -replace '\\', '/')/dist/cli/start.js').runStart
 
     @"
 @echo off
-node "$InstallDir\dist\cli\setup.js"
+node -e "require('$($InstallDir -replace '\\', '/')/dist/cli/setup.js').runSetup()"
 "@ | Set-Content "$BinDir\openclaw-bridge-setup.cmd"
 
     # Add to PATH if not already there

@@ -42,7 +42,7 @@ EOF
 
     cat > "$BIN_DIR/openclaw-bridge-setup" << EOF
 #!/bin/bash
-node "$INSTALL_DIR/dist/cli/setup.js"
+node -e "require('$INSTALL_DIR/dist/cli/setup.js').runSetup()"
 EOF
     chmod +x "$BIN_DIR/openclaw-bridge-setup"
 
