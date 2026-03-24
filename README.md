@@ -2,20 +2,46 @@
 
 ## Install
 
-```bash
-# Install from GitHub
-npm install -g github:Codename-11/openclaw-bridge
-
-# Run setup wizard
-openclaw-bridge setup
-
-# Update to latest
-npm install -g github:Codename-11/openclaw-bridge
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.ps1 | iex
 ```
 
-When published to npm (coming soon):
+**macOS / Linux:**
 ```bash
-npm install -g openclaw-bridge
+curl -fsSL https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.sh | bash
+```
+
+**Then setup:**
+```bash
+openclaw-bridge-setup
+```
+
+**Register with Claude Code:**
+```bash
+claude mcp add openclaw -- openclaw-bridge-mcp
+```
+
+### Update
+```powershell
+# Windows
+irm https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.ps1 | iex  # re-run
+# Or:
+.\install.ps1 update
+```
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.sh | bash -s update
+```
+
+### Uninstall
+```powershell
+# Windows
+powershell -c "& {$s=(irm https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.ps1); & ([scriptblock]::Create($s)) -Action uninstall}"
+```
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/Codename-11/openclaw-bridge/main/install.sh | bash -s uninstall
 ```
 
 **openclaw-bridge** is a modular CLI package that bridges Claude Code and OpenClaw AI agents. It absorbs the functionality of `openclaw-mcp` and extends it with a full module architecture — MCP tools for querying agents from Claude Code, Discord integration, notifications, project memory, steering, and an HTTP bridge for pushing messages into Claude Code sessions from agent code.
