@@ -66,6 +66,33 @@ function Install-Bridge {
         Write-Host "   claude mcp add --scope user openclaw -- $mcpCmd" -ForegroundColor White
     }
 
+    # Register steering hook in .claude.json
+    Write-Step "Registering steering hook..."
+    $hookPath = ($InstallDir + '\hooks\check-steering.js') -replace '\\', '/'
+    $claudeJsonPath = "$env:USERPROFILE\.claude.json"
+    try {
+        $raw = Get-Content $claudeJsonPath -Raw -ErrorAction Stop
+        $hookCmd = "node `"$hookPath`""
+
+        # Check if hook already registered
+        if ($raw -match 'check-steering') {
+            Write-Ok "Steering hook already registered"
+        } else {
+            # Insert hook into the JSON using string manipulation (safer than parsing the huge file)
+            $hookBlock = @"
+  "hooks": {
+    "UserPromptSubmit": [{"matcher":"","hooks":[{"type":"command","command":"$hookCmd"}]}]
+  },
+"@
+            # Insert after the opening brace
+            $raw = $raw -replace '^\{', "{`n$hookBlock"
+            Set-Content $claudeJsonPath -Value $raw -Encoding UTF8 -NoNewline
+            Write-Ok "Steering hook registered"
+        }
+    } catch {
+        Write-Warn "Could not register hook. Add manually to .claude.json"
+    }
+
     # Auto-run setup
     Write-Step "Running setup wizard..."
     node -e "require('$appPath/dist/cli/setup.js').runSetup().catch(e=>{console.error(e);process.exit(1)})"
