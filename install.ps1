@@ -39,7 +39,7 @@ function Install-Bridge {
     # Create batch wrappers
     $appPath = $InstallDir -replace '\\', '/'
 
-    Set-Content "$BinDir\openclaw-bridge-mcp.cmd" "@echo off`nnode `"$InstallDir\dist\modules\mcp\index.js`" %*"
+    Set-Content "$BinDir\openclaw-bridge-mcp.cmd" "@echo off`ncd /d `"$InstallDir`" && node dist\modules\mcp\index.js %*"
     Set-Content "$BinDir\openclaw-bridge.cmd" "@echo off`nnode `"$InstallDir\bin\openclaw-bridge.mjs`" %*"
     Set-Content "$BinDir\openclaw-bridge-setup.cmd" "@echo off`nnode -e `"require('$appPath/dist/cli/setup.js').runSetup().catch(e=>{console.error(e);process.exit(1)})`""
 
@@ -120,7 +120,7 @@ function Update-Bridge {
 
     # Refresh bin wrappers
     $appPath = $InstallDir -replace '\\', '/'
-    Set-Content "$BinDir\openclaw-bridge-mcp.cmd" "@echo off`nnode `"$InstallDir\dist\modules\mcp\index.js`" %*"
+    Set-Content "$BinDir\openclaw-bridge-mcp.cmd" "@echo off`ncd /d `"$InstallDir`" && node dist\modules\mcp\index.js %*"
     Set-Content "$BinDir\openclaw-bridge.cmd" "@echo off`nnode `"$InstallDir\bin\openclaw-bridge.mjs`" %*"
     Set-Content "$BinDir\openclaw-bridge-setup.cmd" "@echo off`nnode -e `"require('$appPath/dist/cli/setup.js').runSetup().catch(e=>{console.error(e);process.exit(1)})`""
 
