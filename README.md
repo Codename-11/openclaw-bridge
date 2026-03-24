@@ -125,6 +125,20 @@ openclaw-bridge/
 └── dist/                       ← Compiled output
 ```
 
+## Uninstall
+
+```bash
+# Remove from Claude Code
+claude mcp remove openclaw
+
+# Remove global install (if installed globally)
+npm uninstall -g openclaw-bridge
+
+# Remove config
+rm -rf ~/.openclaw-bridge          # macOS/Linux
+rmdir /s /q %USERPROFILE%\.openclaw-bridge   # Windows
+```
+
 ## License
 
 MIT
