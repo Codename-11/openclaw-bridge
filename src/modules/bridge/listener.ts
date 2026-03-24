@@ -50,6 +50,7 @@ export class BridgeListener {
               session: {
                 active: this.session.isActive(),
                 id: this.session.getSessionId() || null,
+                continueMode: this.session.isContinueMode(),
               },
             })
             return
@@ -57,16 +58,22 @@ export class BridgeListener {
 
           if (method === 'POST' && url === '/session') {
             const body = await readBody(req)
-            const data = JSON.parse(body) as { project?: string; resume?: string }
+            const data = JSON.parse(body) as { project?: string; resume?: string; continue?: boolean }
 
             if (data.resume) {
+              // Resume a specific session by ID
               await this.session.resume(data.resume)
-              json(res, 200, { ok: true, sessionId: this.session.getSessionId() })
+              json(res, 200, { ok: true, mode: 'resume', sessionId: this.session.getSessionId() })
+            } else if (data.continue) {
+              // Continue the latest session in the project dir
+              await this.session.continueLatest(data.project)
+              json(res, 200, { ok: true, mode: 'continue', project: data.project })
             } else if (data.project) {
+              // Fresh session (no shared context)
               await this.session.create(data.project)
-              json(res, 200, { ok: true, sessionId: this.session.getSessionId() })
+              json(res, 200, { ok: true, mode: 'fresh', sessionId: this.session.getSessionId() })
             } else {
-              json(res, 400, { error: "Provide 'project' or 'resume'" })
+              json(res, 400, { error: "Provide 'project', 'resume', or 'continue'" })
             }
             return
           }

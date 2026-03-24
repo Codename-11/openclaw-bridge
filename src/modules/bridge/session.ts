@@ -7,17 +7,35 @@ export class CCSession {
   private projectDir: string = ''
   private sessionId: string = ''
   private active: boolean = false
+  private continueMode: boolean = false
 
   async create(projectDir: string): Promise<void> {
     this.projectDir = projectDir
     this.active = true
+    this.continueMode = false
+    this.sessionId = ''
     logger.info(`CC session created for project: ${projectDir}`)
     logger.info('Using claude CLI --print mode for message passing')
   }
 
+  async resume(sessionId: string): Promise<void> {
+    this.sessionId = sessionId
+    this.active = true
+    this.continueMode = true
+    logger.info(`CC session will resume: ${sessionId}`)
+  }
+
+  async continueLatest(projectDir?: string): Promise<void> {
+    if (projectDir) this.projectDir = projectDir
+    this.active = true
+    this.continueMode = true
+    this.sessionId = ''
+    logger.info(`CC session will continue latest in: ${this.projectDir || 'cwd'}`)
+  }
+
   async sendMessage(message: string): Promise<string> {
     if (!this.active) {
-      throw new Error('No active CC session — call create() first')
+      throw new Error('No active CC session — call create(), resume(), or continueLatest() first')
     }
 
     logger.debug(`Sending message to CC via CLI`, { chars: message.length })
@@ -27,6 +45,13 @@ export class CCSession {
         '--print',
         '--output-format', 'text',
       ]
+
+      // Resume a specific session or continue the latest
+      if (this.sessionId) {
+        args.push('--resume', this.sessionId)
+      } else if (this.continueMode) {
+        args.push('--continue')
+      }
 
       const opts: { timeout: number; cwd?: string; maxBuffer: number } = {
         timeout: 120000,
@@ -55,17 +80,15 @@ export class CCSession {
     })
   }
 
-  async resume(sessionId: string): Promise<void> {
-    this.sessionId = sessionId
-    this.active = true
-    logger.info(`CC session resumed: ${sessionId}`)
-  }
-
   getSessionId(): string {
     return this.sessionId
   }
 
   isActive(): boolean {
     return this.active
+  }
+
+  isContinueMode(): boolean {
+    return this.continueMode
   }
 }

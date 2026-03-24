@@ -8,15 +8,32 @@ class CCSession {
     projectDir = '';
     sessionId = '';
     active = false;
+    continueMode = false;
     async create(projectDir) {
         this.projectDir = projectDir;
         this.active = true;
+        this.continueMode = false;
+        this.sessionId = '';
         logger.info(`CC session created for project: ${projectDir}`);
         logger.info('Using claude CLI --print mode for message passing');
     }
+    async resume(sessionId) {
+        this.sessionId = sessionId;
+        this.active = true;
+        this.continueMode = true;
+        logger.info(`CC session will resume: ${sessionId}`);
+    }
+    async continueLatest(projectDir) {
+        if (projectDir)
+            this.projectDir = projectDir;
+        this.active = true;
+        this.continueMode = true;
+        this.sessionId = '';
+        logger.info(`CC session will continue latest in: ${this.projectDir || 'cwd'}`);
+    }
     async sendMessage(message) {
         if (!this.active) {
-            throw new Error('No active CC session — call create() first');
+            throw new Error('No active CC session — call create(), resume(), or continueLatest() first');
         }
         logger.debug(`Sending message to CC via CLI`, { chars: message.length });
         return new Promise((resolve, reject) => {
@@ -24,6 +41,13 @@ class CCSession {
                 '--print',
                 '--output-format', 'text',
             ];
+            // Resume a specific session or continue the latest
+            if (this.sessionId) {
+                args.push('--resume', this.sessionId);
+            }
+            else if (this.continueMode) {
+                args.push('--continue');
+            }
             const opts = {
                 timeout: 120000,
                 maxBuffer: 10 * 1024 * 1024,
@@ -48,16 +72,14 @@ class CCSession {
             child.stdin?.end();
         });
     }
-    async resume(sessionId) {
-        this.sessionId = sessionId;
-        this.active = true;
-        logger.info(`CC session resumed: ${sessionId}`);
-    }
     getSessionId() {
         return this.sessionId;
     }
     isActive() {
         return this.active;
+    }
+    isContinueMode() {
+        return this.continueMode;
     }
 }
 exports.CCSession = CCSession;
