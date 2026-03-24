@@ -82,7 +82,7 @@ export class McpModule implements BridgeModule {
 
 // Allow direct execution: node dist/modules/mcp/index.js
 // This is the entrypoint used when running standalone MCP mode
-if (process.argv[1] && process.argv[1].endsWith('mcp/index.js')) {
+if (process.argv[1] && (process.argv[1].endsWith('mcp/index.js') || process.argv[1].endsWith('mcp\\index.js'))) {
   ;(async () => {
     const { loadConfig } = await import('../../core/config.js')
     const config = loadConfig()
