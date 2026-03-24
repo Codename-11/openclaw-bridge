@@ -8,18 +8,16 @@
     "openclaw-bridge": "bin/openclaw-bridge.mjs"
   },
   "scripts": {
-    
     "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc",
     "dev": "tsx src/index.ts",
     "clean": "rm -rf dist"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "latest"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.0.0",
     "tsx": "^4.0.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "@modelcontextprotocol/sdk": "latest"
   },
   "engines": {
     "node": ">=18.0.0"
