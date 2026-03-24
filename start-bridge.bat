@@ -9,5 +9,5 @@ if not exist dist (
     echo Building...
     npm run build
 )
-node dist\cli\start.js bridge
+node -e "require('./dist/cli/start.js').runStart(['bridge'])"
 pause
