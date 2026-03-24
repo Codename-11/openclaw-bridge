@@ -51,19 +51,33 @@ async function runSetup() {
     const gatewayUrl = normalizeGatewayUrl(rawUrl);
     console.log(`  → Using: ${gatewayUrl}`);
     console.log('');
+    console.log('  Your gateway auth token. Found in ~/.openclaw/openclaw.json under gateway.auth.token');
     const tokenPrompt = existing.gateway.token
         ? 'Gateway token [press enter to keep current]: '
         : 'Gateway token (required): ';
     const token = await ask(rl, tokenPrompt, existing.gateway.token);
-    const mcpInput = await ask(rl, '\nEnable MCP module? (CC asks agents) [Y/n]: ', 'y');
+    console.log('');
+    console.log('  MCP module lets Claude Code ask your OpenClaw agents questions,');
+    console.log('  read Discord messages, send notifications, and more.');
+    console.log('  Recommended: Yes — this is the core feature.');
+    const mcpInput = await ask(rl, 'Enable MCP module? [Y/n]: ', 'y');
     const mcpEnabled = mcpInput.toLowerCase() !== 'n';
-    const bridgeInput = await ask(rl, 'Enable Bridge module? (agents push to CC) [y/N]: ', 'n');
+    console.log('');
+    console.log('  Bridge module lets your agents push messages INTO a running');
+    console.log('  Claude Code session. Requires running a local HTTP listener.');
+    console.log('  Optional — enable if you want agents to steer CC in real-time.');
+    const bridgeInput = await ask(rl, 'Enable Bridge module? [y/N]: ', 'n');
     const bridgeEnabled = bridgeInput.toLowerCase() === 'y';
     let bridgePort = existing.modules.bridge.port;
     let defaultProject = existing.modules.bridge.defaultProject;
     if (bridgeEnabled) {
+        console.log('');
+        console.log('  Port the bridge HTTP listener will run on.');
         const portInput = await ask(rl, `Bridge port [${bridgePort}]: `, String(bridgePort));
         bridgePort = parseInt(portInput, 10) || bridgePort;
+        console.log('');
+        console.log('  Default project directory for Claude Code sessions.');
+        console.log('  Leave blank to use current directory when starting the bridge.');
         const projectInput = await ask(rl, `Default project directory [${defaultProject || 'none'}]: `, defaultProject);
         defaultProject = projectInput;
     }
