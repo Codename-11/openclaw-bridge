@@ -27,6 +27,10 @@ install_bridge() {
         git clone --quiet "$REPO_URL" "$INSTALL_DIR"
     fi
 
+    # Install runtime dependencies
+    ok "Installing dependencies..."
+    cd "$INSTALL_DIR" && npm install --omit=dev --no-optional --ignore-scripts 2>/dev/null
+
     # Create bin wrappers
     cat > "$BIN_DIR/openclaw-bridge-mcp" << EOF
 #!/bin/bash

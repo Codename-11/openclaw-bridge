@@ -30,6 +30,12 @@ function Install-Bridge {
         git clone --quiet $RepoUrl $InstallDir
     }
 
+    # Install runtime dependencies
+    Write-Ok "Installing dependencies..."
+    Push-Location $InstallDir
+    npm install --omit=dev --no-optional --ignore-scripts 2>$null
+    Pop-Location
+
     # Create batch wrappers
     $appPath = $InstallDir -replace '\\', '/'
 
