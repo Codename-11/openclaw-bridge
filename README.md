@@ -25,6 +25,22 @@ npx openclaw-bridge setup
 | **bridge** | HTTP server (port 9999) — wraps Claude Code SDK session, lets agents send messages into CC |
 | **relay** | Placeholder for future Voxel device relay (not implemented) |
 
+## Feature Matrix
+
+| Feature | MCP only | MCP + Bridge |
+|---------|----------|-------------|
+| CC asks agents questions | ✅ | ✅ |
+| CC reads Discord messages | ✅ | ✅ |
+| CC posts to Discord | ✅ | ✅ |
+| CC sends notifications | ✅ | ✅ |
+| CC reads/writes project memory | ✅ | ✅ |
+| CC checks steering directions | ✅ | ✅ |
+| CC announces status | ✅ | ✅ |
+| Daemon pushes messages to CC | ❌ | ✅ |
+| Daemon steers CC in real-time | ❌ | ✅ |
+
+**MCP tools work without the bridge.** Start the bridge only when you want agents to push messages to CC.
+
 ## Claude Code Integration
 
 After running `setup`, the wizard will offer to register the MCP server automatically. Or do it manually:
