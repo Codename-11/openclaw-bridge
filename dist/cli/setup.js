@@ -44,7 +44,8 @@ async function runSetup() {
     const existing = (0, config_js_1.loadConfig)();
     const rl = (0, readline_1.createInterface)({ input: process.stdin, output: process.stdout });
     console.log('  Enter your OpenClaw gateway address.');
-    console.log('  Examples: 172.16.24.250, 192.168.1.100:18789, http://localhost:18789');
+    console.log('  Examples: 192.168.1.100, myserver:18789, http://localhost:18789');
+    console.log('  Default port 18789 is added automatically if omitted.');
     console.log('');
     const rawUrl = await ask(rl, `Gateway URL [${existing.gateway.url}]: `, existing.gateway.url);
     const gatewayUrl = normalizeGatewayUrl(rawUrl);
