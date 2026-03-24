@@ -23,9 +23,7 @@ class CCSession {
             const args = [
                 '--print',
                 '--output-format', 'text',
-                '--message', message,
             ];
-            // If we have a project dir, set cwd
             const opts = {
                 timeout: 120000,
                 maxBuffer: 10 * 1024 * 1024,
@@ -33,7 +31,7 @@ class CCSession {
             if (this.projectDir) {
                 opts.cwd = this.projectDir;
             }
-            (0, child_process_1.execFile)('claude', args, opts, (err, stdout, stderr) => {
+            const child = (0, child_process_1.execFile)('claude', args, opts, (err, stdout, stderr) => {
                 if (err) {
                     logger.warn(`CLI error: ${err.message}`);
                     if (stderr)
@@ -45,6 +43,9 @@ class CCSession {
                 logger.debug(`Received response from CC`, { chars: text.length });
                 resolve(text);
             });
+            // Send message via stdin
+            child.stdin?.write(message);
+            child.stdin?.end();
         });
     }
     async resume(sessionId) {

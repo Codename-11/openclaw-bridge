@@ -26,10 +26,8 @@ export class CCSession {
       const args = [
         '--print',
         '--output-format', 'text',
-        '--message', message,
       ]
 
-      // If we have a project dir, set cwd
       const opts: { timeout: number; cwd?: string; maxBuffer: number } = {
         timeout: 120000,
         maxBuffer: 10 * 1024 * 1024,
@@ -38,7 +36,7 @@ export class CCSession {
         opts.cwd = this.projectDir
       }
 
-      execFile('claude', args, opts, (err, stdout, stderr) => {
+      const child = execFile('claude', args, opts, (err, stdout, stderr) => {
         if (err) {
           logger.warn(`CLI error: ${err.message}`)
           if (stderr) logger.debug(`stderr: ${stderr}`)
@@ -50,6 +48,10 @@ export class CCSession {
         logger.debug(`Received response from CC`, { chars: text.length })
         resolve(text)
       })
+
+      // Send message via stdin
+      child.stdin?.write(message)
+      child.stdin?.end()
     })
   }
 
