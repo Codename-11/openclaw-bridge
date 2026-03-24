@@ -12,6 +12,9 @@ export declare class GatewayClient {
     private headers;
     askAgent(agent: string, message: string): Promise<string>;
     listAgents(): Promise<Agent[]>;
+    askAgentForDiscord(agent: string, channel: string, limit: number): Promise<string>;
+    askAgentToSendDiscord(agent: string, channel: string, message: string): Promise<string>;
+    askAgentToNotify(agent: string, targetChannel: string, message: string): Promise<string>;
     healthCheck(): Promise<boolean>;
 }
 //# sourceMappingURL=gateway.d.ts.map

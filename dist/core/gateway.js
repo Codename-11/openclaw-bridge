@@ -79,6 +79,108 @@ class GatewayClient {
             throw new Error(`Failed to list agents: ${msg}`);
         }
     }
+    async askAgentForDiscord(agent, channel, limit) {
+        const prompt = `Read the last ${limit} messages from Discord channel #${channel} using the message tool with action=read, channel="${channel}", limit=${limit}. Return them formatted as: [timestamp] sender: message\n\nIf you cannot read the channel or there are no messages, say so clearly.`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60_000);
+        try {
+            logger.debug(`Asking ${agent} to read Discord #${channel} (limit ${limit})`);
+            const response = await fetch(`${this.url}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    ...this.headers(),
+                    'x-openclaw-session-key': `agent:${agent}:bridge-discord`,
+                },
+                body: JSON.stringify({
+                    model: `openclaw:${agent}`,
+                    stream: false,
+                    messages: [{ role: 'user', content: prompt }],
+                }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeout);
+            if (!response.ok) {
+                const errText = await response.text().catch(() => response.statusText);
+                throw new Error(`Gateway error (${response.status}): ${errText}`);
+            }
+            const data = (await response.json());
+            return data?.choices?.[0]?.message?.content ?? JSON.stringify(data, null, 2);
+        }
+        catch (err) {
+            clearTimeout(timeout);
+            const msg = err instanceof Error ? err.message : String(err);
+            logger.error(`askAgentForDiscord failed: ${msg}`);
+            throw new Error(`Discord read via agent '${agent}' failed: ${msg}`);
+        }
+    }
+    async askAgentToSendDiscord(agent, channel, message) {
+        const prompt = `Send the following message to Discord channel #${channel} using the message tool with action=send, target="${channel}": ${message}\n\nConfirm when sent.`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60_000);
+        try {
+            logger.debug(`Asking ${agent} to send to Discord #${channel}`);
+            const response = await fetch(`${this.url}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    ...this.headers(),
+                    'x-openclaw-session-key': `agent:${agent}:bridge-discord`,
+                },
+                body: JSON.stringify({
+                    model: `openclaw:${agent}`,
+                    stream: false,
+                    messages: [{ role: 'user', content: prompt }],
+                }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeout);
+            if (!response.ok) {
+                const errText = await response.text().catch(() => response.statusText);
+                throw new Error(`Gateway error (${response.status}): ${errText}`);
+            }
+            const data = (await response.json());
+            return data?.choices?.[0]?.message?.content ?? 'Message sent.';
+        }
+        catch (err) {
+            clearTimeout(timeout);
+            const msg = err instanceof Error ? err.message : String(err);
+            logger.error(`askAgentToSendDiscord failed: ${msg}`);
+            throw new Error(`Discord send via agent '${agent}' failed: ${msg}`);
+        }
+    }
+    async askAgentToNotify(agent, targetChannel, message) {
+        const prompt = `Send the following message to Discord channel ${targetChannel} using the message tool with action=send, channel="${targetChannel}": ${message}\n\nConfirm when sent.`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60_000);
+        try {
+            logger.debug(`Asking ${agent} to notify channel ${targetChannel}`);
+            const response = await fetch(`${this.url}/v1/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    ...this.headers(),
+                    'x-openclaw-session-key': `agent:${agent}:bridge-notify`,
+                },
+                body: JSON.stringify({
+                    model: `openclaw:${agent}`,
+                    stream: false,
+                    messages: [{ role: 'user', content: prompt }],
+                }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeout);
+            if (!response.ok) {
+                const errText = await response.text().catch(() => response.statusText);
+                throw new Error(`Gateway error (${response.status}): ${errText}`);
+            }
+            const data = (await response.json());
+            return data?.choices?.[0]?.message?.content ?? 'Notification sent.';
+        }
+        catch (err) {
+            clearTimeout(timeout);
+            const msg = err instanceof Error ? err.message : String(err);
+            logger.error(`askAgentToNotify failed: ${msg}`);
+            throw new Error(`Notify via agent '${agent}' failed: ${msg}`);
+        }
+    }
     async healthCheck() {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10_000);
