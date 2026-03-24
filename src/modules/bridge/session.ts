@@ -10,18 +10,22 @@ let sdkAvailable = false
 async function loadSDK(): Promise<boolean> {
   if (sdkAvailable) return true
   try {
-    // Dynamic import avoids compile-time resolution of the optional dep
+    // The SDK is ESM-only. Use dynamic import() which works in both CJS and ESM.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mod = await (Function('return import("@anthropic-ai/claude-code")')() as Promise<any>)
-    ClaudeCodeSDK = (mod as Record<string, unknown>).ClaudeCodeSDK as new () => unknown
+    const mod = await (Function('return import("@anthropic-ai/claude-code")')()) as any
+    // Try named export first, then default
+    ClaudeCodeSDK = mod.ClaudeCodeSDK ?? mod.default?.ClaudeCodeSDK ?? mod.default
     if (!ClaudeCodeSDK) {
-      logger.warn('@anthropic-ai/claude-code loaded but ClaudeCodeSDK export not found')
+      // Maybe it exports differently — log what we got
+      logger.warn(`SDK loaded but ClaudeCodeSDK not found. Exports: ${Object.keys(mod).join(', ')}`)
       return false
     }
     sdkAvailable = true
+    logger.info('Claude Code SDK loaded successfully')
     return true
-  } catch {
-    logger.warn('@anthropic-ai/claude-code not available — bridge module will not function')
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    logger.warn(`@anthropic-ai/claude-code not available: ${msg}`)
     return false
   }
 }
