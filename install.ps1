@@ -53,16 +53,17 @@ function Install-Bridge {
 
     Write-Ok "Installed to: $InstallDir"
 
-    # Auto-register MCP with Claude Code
+    # Auto-register MCP with Claude Code (user scope = all projects)
     Write-Step "Registering MCP with Claude Code..."
     $mcpCmd = "$BinDir\openclaw-bridge-mcp.cmd"
     try { & claude mcp remove openclaw 2>$null } catch {}
+    try { & claude mcp remove --scope user openclaw 2>$null } catch {}
     try {
-        & claude mcp add openclaw -- $mcpCmd
-        Write-Ok "MCP registered"
+        & claude mcp add --scope user openclaw -- $mcpCmd
+        Write-Ok "MCP registered (user scope — all projects)"
     } catch {
         Write-Warn "Could not auto-register MCP. Run manually:"
-        Write-Host "   claude mcp add openclaw -- $mcpCmd" -ForegroundColor White
+        Write-Host "   claude mcp add --scope user openclaw -- $mcpCmd" -ForegroundColor White
     }
 
     # Auto-run setup
